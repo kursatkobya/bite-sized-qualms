@@ -16,7 +16,7 @@ fn main() {
 
     // File hosts must exist in current path before this produces output
     if let Ok(lines) = read_lines("./port-details") {
-        // Consumes the iterator, returns an (Optional) String
+        let mut current_port: u16 = 0 ;
         for line in lines {
             if let Ok(detail) = line {
                 let mut results = detail.split_whitespace();
@@ -24,6 +24,10 @@ fn main() {
                 let port_proto = results.next().unwrap();
                 let mut port_proto = port_proto.split('/');
                 let port = port_proto.next().unwrap().parse::<u16>().unwrap();
+                if port == current_port {
+                    continue;
+                }
+                current_port = port;
                 let proto = port_proto.next().unwrap();
                 out_writer
                     .write(format!("m.insert({}, \"{}       {}\");\n", port, service, proto).as_bytes())
